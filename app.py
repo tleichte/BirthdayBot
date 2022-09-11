@@ -124,7 +124,7 @@ class BirthdayGroup(app_commands.Group):
 
         if interaction.guild is not None and db.has_notify(interaction.guild.id):
             if birthday_obj.hasAge:
-                curr_date = datetime.utcnow().date()
+                curr_date = datetime.datetime.utcnow().date()
                 if birthday_obj.month == curr_date.month and birthday_obj.day == curr_date.day:
                     out_str += f" They are turning {date_helper.get_age(birthday_obj):,} today! :tada:"
                 else:
