@@ -1,0 +1,66 @@
+{
+    "color": {
+        "r": 74,
+        "g": 200,
+        "b": 245
+    },
+    "author":{
+        "name": "Tyler Eichten",
+        "icon_url": "https://avatars0.githubusercontent.com/u/25017369",
+        "url": "https://github.com/tleichte"
+    },
+    "title": "Birthday Bot",
+    "description": "Because we all need a little help remembering. Allows you to set your birthday, and it can notify everyone in your server on your special day!",
+    "footer": "This bot ignores weird old date rules and works off of UTC time.\nIf you have a problem with that, I refer you to this:\nhttps://www.youtube.com/watch?v=-5wpm-gesOY",
+    "entries":[
+        {
+            "command": "birthday help",
+            "description": "Shows this help dialog."
+        },
+        {
+            "command": "birthday all",
+            "description": "Shows all birthdays for this server."
+        },
+        {
+            "command": "birthday next",
+            "description": "Shows the next birthday for this server."
+        },
+        {
+            "command": "birthday get [@mention | username | display name]",
+            "description": "Shows a given user's birthday."
+        },
+        {
+            "command": "birthday set [date]",
+            "description": "Sets your birthday to the given date. It is remembered across all servers. Year is not required, but it is necessary for age.\n\nAcceptable date formats include (but not limited to):\nFebruary 29\nFeb 29, 2000\n2/29/00\n2-29-2000"
+        },
+        {
+            "command": "birthday remove",
+            "description": "Removes your birthday from the bot."
+        },
+        {
+            "command": "birthday set_channel (ADMIN ONLY)",
+            "description": "Uses this channel to announce birthdays.\nIf you disabled notifications, use this command to bring it back.\nNO ANNOUNCEMENTS WILL BE MADE UNTIL THIS IS DONE."
+        },
+        {
+            "command": "birthday set_time [24hr time (00:00)] (ADMIN ONLY)",
+            "description": "Sets the UTC 24hr time for announcing birthdays. Defaults to 12:00 UTC"
+        },
+        {
+            "command": "birthday set_prefix (ADMIN ONLY)",
+            "description": "Sets the prefix for all commands. Must be between 1-3 characters. Default is \"!\""
+        },
+        {
+            "command": "birthday disable_notify (ADMIN ONLY)",
+            "description": "Disables birthday notifications for this server."
+        },
+        {
+            "command": "birthday ping",
+            "description": "Shows the bot's current ping."
+        }
+    ],
+
+    "template": {
+        "command": "command",
+        "description": "description"
+    }
+}
