@@ -1,4 +1,5 @@
 import calendar
+import enum
 import re
 from datetime import datetime
 
@@ -18,8 +19,22 @@ months = [
     ("December", "Dec")
 ]
 
+class BirthdayMonth(enum.Enum):
+        January     = 1
+        February    = 2
+        March       = 3
+        April       = 4
+        May         = 5
+        June        = 6
+        July        = 7
+        August      = 8
+        September   = 9
+        October     = 10
+        November    = 11
+        December    = 12
+
 class Birthday:
-    def __init__(self, month, day, year=None):
+    def __init__(self, month: int, day:int, year:int=None):
         self.month = month
         self.day = day
         self.year = year
@@ -59,7 +74,7 @@ def parse_birthday(birthday: str):
         else:
             year = None
 
-        return _get_bday_if_valid(month, day, year)
+        return get_bday_if_valid(month, day, year)
 
     if re.match(word_regex, birthday):
         print("Matched word regex!")
@@ -83,29 +98,27 @@ def parse_birthday(birthday: str):
         else:
             year = None
 
-        return _get_bday_if_valid(month, day, year)
+        return get_bday_if_valid(month, day, year)
 
     print("No regex matched, returning none.")
     return None
 
+class BirthdayParseException(Exception):
+    def __init__(self, message:str) -> None:
+        self.message = message
 
-def _get_bday_if_valid(month, day, year):
+def get_bday_if_valid(month : BirthdayMonth, day, year):
     
     if year is not None and year > datetime.utcnow().date().year:
-        print(f"Year {year} is more than the current year!")
-        return None
+        raise BirthdayParseException(f"Year {year} is more than the current year!")
 
-    if year is None and (day > calendar.mdays[month] or (month is 2 and day is not 29)):
-        print(f"Day {day} out of range for month {month}")
-        return None
+    if year is None and (day > calendar.mdays[month.value]) and (month != BirthdayMonth.February or day != 29):
+        raise BirthdayParseException(f"{month.name} {day} is not a real date!")
     
-    if year is not None and day > calendar.monthrange(year, month)[1]:
-        print(f"Day {day} out of range for month {month}, {year}")
-        return None
+    if year is not None and day > calendar.monthrange(year, month.value)[1]:
+        raise BirthdayParseException(f"{month.name} {day}, {year} is not a real date!")
     
-
-    
-    birthday : Birthday = Birthday(month, day, year)
+    birthday : Birthday = Birthday(month.value, day, year)
 
     if birthday.hasAge and get_age(birthday) < 0:
         return None

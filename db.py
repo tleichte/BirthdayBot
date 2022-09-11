@@ -81,7 +81,7 @@ def _get_data(command: str, params: tuple = None):
 
 def _get_single_row(command: str, params: tuple = None):
     data = _get_data(command, params)
-    if data is None or len(data) is 0:
+    if data is None or len(data) == 0:
         return None
     return data[0]
 
