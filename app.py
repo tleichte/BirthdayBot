@@ -175,8 +175,9 @@ class BirthdayGroup(app_commands.Group):
             member: Member = interaction.guild.get_member(birthday_tuple[0])
             birthday: Birthday = birthday_tuple[1]
             out_str += f"**{member.display_name}**: {birthday}"
-            if (birthday.hasAge):
-                out_str += f" ({date_helper.get_age(birthday)} yrs old)"
+            # Remove year from immediate display
+            # if (birthday.hasAge):
+            #     out_str += f" ({date_helper.get_age(birthday)} yrs old)"
             out_str += "\n"
             
         await respond(interaction, f":mag_right::notepad_spiral: Here are all the birthdays I know:\n{out_str}")
@@ -215,7 +216,7 @@ class BirthdayGroup(app_commands.Group):
         next_birthday : Birthday = next_birthday_tuple[1]
 
         out_str = f":calendar_spiral: Mark your calendars, The next birthday is **{member.display_name}** ({next_birthday})!"
-        
+     
         if next_birthday.hasAge:
             out_str += f" They will be turning {date_helper.get_age(next_birthday)+1}."
 

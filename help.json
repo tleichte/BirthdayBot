@@ -31,7 +31,7 @@
         },
         {
             "command": "birthday set [date]",
-            "description": "Sets your birthday to the given date. It is remembered across all servers. Year is not required, but it is necessary for age.\n\nAcceptable date formats include (but not limited to):\nFebruary 29\nFeb 29, 2000\n2/29/00\n2-29-2000"
+            "description": "Sets your birthday to the given date. It is remembered across all servers. Year is not required, but it is necessary for age-based messages.\n\nAcceptable date formats include (but not limited to):\nFebruary 29\nFeb 29, 2000\n2/29/00\n2-29-2000"
         },
         {
             "command": "birthday remove",

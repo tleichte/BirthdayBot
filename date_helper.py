@@ -41,8 +41,9 @@ class Birthday:
         self.hasAge = self.year is not None
 
     def __repr__(self):
-        if self.hasAge:
-            return "{} {}, {}".format(months[self.month][0], self.day, self.year)
+        # Removed year display from birthday
+        # if self.hasAge:
+        #     return "{} {}, {}".format(months[self.month][0], self.day, self.year)
         return "{} {}".format(months[self.month][0], self.day)
 
 
