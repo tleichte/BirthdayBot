@@ -52,9 +52,6 @@ class BirthdayGroup(app_commands.Group):
         
         color_obj = help_obj["color"]
         help_embed.colour = discord.Color.from_rgb(color_obj["r"], color_obj["g"], color_obj["b"])
-        
-        author_obj = help_obj["author"]
-        help_embed.set_author(name=author_obj["name"], icon_url=author_obj["icon_url"], url=author_obj["url"])
 
         help_embed.title = help_obj["title"]
         help_embed.description = help_obj["description"]
@@ -67,14 +64,15 @@ class BirthdayGroup(app_commands.Group):
 
         await interaction.response.send_message(embed=help_embed)
 
-    @app_commands.command(description="(Admin) Sets the UTC 24hr time for announcing birthdays. Defaults to 12:00 UTC")
+    @app_commands.command(description="[Admin] Sets the UTC 24hr time for announcing birthdays for this server. Defaults to 12:00 UTC")
+    @app_commands.guild_only()
     async def set_time(self, interaction:Interaction, time_str:str):
         if not await check_admin(interaction):
             return
 
         
         if not re.match(r"^([01]?\d|2[0-3]):[0-6]\d$", time_str):
-            await respond(interaction, "Time must match 24hr 00:00 format.")
+            await respond(interaction, "Time must match 24hr 00:00 format.", ephemeral=True)
             return
 
         objects = time_str.split(":")
@@ -84,40 +82,43 @@ class BirthdayGroup(app_commands.Group):
         db.set_time(interaction.guild.id, hour, minute)
 
         #send to database
-        await respond(interaction, f"Successfully set the announcement time to {hour:02}:{minute:02}")
+        await respond(interaction, f"Successfully set the announcement time to {hour:02}:{minute:02}", ephemeral=True)
 
-    @app_commands.command(description="(Admin) Uses this channel to announce birthdays. No announcements will be made until this is done.")
+    @app_commands.command(description="[Admin] Uses this channel to announce birthdays. No announcements will be made until this is done.")
+    @app_commands.guild_only()
     async def set_channel(self, interaction:Interaction):
         if not await check_admin(interaction):
             return
         
         db.set_channel(interaction.guild.id, interaction.channel.id)
 
-        await respond(interaction, ":thumbsup: Got it! I'll make sure to let everyone know here.")
+        await respond(interaction, ":thumbsup: Got it! I'll make sure to let everyone know in this channel.", ephemeral=True)
 
-    @app_commands.command(description="(Admin) Disables birthday notifications for this server")
+    @app_commands.command(description="[Admin] Disables birthday notifications for this server")
+    @app_commands.guild_only()
     async def disable_notify(self, interaction:Interaction):
         if not await check_admin(interaction):
             return
 
         db.remove_channel(interaction.guild.id)
 
-        await respond(interaction, f":shushing_face: Got it, I wont bother everyone. If you change your mind, just set the announcement channel again with */birthday set_channel*")
+        await respond(interaction, f":shushing_face: Got it, I wont bother everyone. If you change your mind, just set the announcement channel again with */birthday set_channel*", ephemeral=True)
 
     @app_commands.command(description="Shows a given member's birthday")
-    async def get(self, interaction:Interaction, member: Member):
+    @app_commands.guild_only()
+    async def get(self, interaction:Interaction, member: User):
 
         if (member.id == bot.user.id):
-            await respond(interaction, f"I don't really have a *birthday*, but my most recent update was on {config['last_update']} :robot:")
+            await respond(interaction, f"I don't really have a *birthday*, but my most recent update was on {config['last_update']} :robot:", ephemeral=True)
             return
 
         if (member.bot):
-            await respond(interaction, f":robot: I'd look inside **{member.display_name}'s** code to tell you, but I don't think they'd be a fan of that. :grimacing:")
+            await respond(interaction, f":robot: I'd look inside **{member.display_name}'s** code to tell you, but I don't think they'd be a fan of that. :grimacing:", ephemeral=True)
             return
 
         birthday_obj : Birthday = db.get_birthday(member.id)
         if birthday_obj is None:
-            await respond(interaction, f":shrug: Sorry, I wish I knew! **{member.display_name}** hasn't told me their birthday yet.")
+            await respond(interaction, f":shrug: Sorry, I wish I knew! **{member.display_name}** hasn't told me their birthday yet.", ephemeral=True)
             return
         
         out_str = f"**{member.display_name}**'s birthday is **{birthday_obj}**."
@@ -132,13 +133,13 @@ class BirthdayGroup(app_commands.Group):
             else:
                 out_str += " I'll be sure to let you know then! :tada:"
         
-        await respond(interaction, out_str)
+        await respond(interaction, out_str, ephemeral=True)
 
     @app_commands.command(description="Sets your birthday. Year not required, but necessary for age. Remembered across all servers.")
     async def set(self, interaction: Interaction, month: BirthdayMonth, day: app_commands.Range[int, 0, 31], year:int = None):
 
         if interaction.user.bot:
-            await respond(interaction, ":face_with_raised_eyebrow::mag_right: 010110010110111101110101001000000110001101100001011011100010011101110100001000000110011001101111011011110110110000100000011011010110010100101110", False)
+            await respond(interaction, ":face_with_raised_eyebrow::mag_right: 010110010110111101110101001000000110001101100001011011100010011101110100001000000110011001101111011011110110110000100000011011010110010100101110")
             return
 
         # Parse birthday, then set
@@ -157,9 +158,10 @@ class BirthdayGroup(app_commands.Group):
             out_str += " I'll be sure to let everyone know when it's your birthday."
         out_str += " :thumbsup:"
 
-        await respond(interaction, out_str)
+        await respond(interaction, out_str, ephemeral=True)
 
     @app_commands.command(description="Shows all birthdays for this server")
+    @app_commands.guild_only()
     async def all(self, interaction: Interaction):
         if not await check_server(interaction):
             return
@@ -167,7 +169,7 @@ class BirthdayGroup(app_commands.Group):
         birthdays = db.get_all_birthdays(interaction.guild.id)
 
         if (len(birthdays) == 0):
-            await respond(interaction, "I don't know any birthdays! Use **/birthday set** to set yours!")
+            await respond(interaction, "I don't know any birthdays! Use **/birthday set** to set yours!", ephemeral=True)
             return
 
         out_str = ""
@@ -180,10 +182,11 @@ class BirthdayGroup(app_commands.Group):
             #     out_str += f" ({date_helper.get_age(birthday)} yrs old)"
             out_str += "\n"
             
-        await respond(interaction, f":mag_right::notepad_spiral: Here are all the birthdays I know:\n{out_str}")
+        await respond(interaction, f":mag_right::notepad_spiral: Here are all the birthdays I know:\n{out_str}", ephemeral=True)
 
 
     @app_commands.command(description="Shows the next birthday for this server")
+    @app_commands.guild_only()
     async def next(self, interaction: Interaction):
         if not await check_server(interaction):
             return
@@ -209,7 +212,7 @@ class BirthdayGroup(app_commands.Group):
                 next_birthday_tuple = birthdays[0]
             else:
                 # No birthdays
-                await respond(interaction, f"I don't know anyone's birthday! Use */birthday help* to see how to add yours!")
+                await respond(interaction, f"I don't know anyone's birthday! Use */birthday help* to see how to add yours!", ephemeral=True)
                 return
 
         member: Member = interaction.guild.get_member(next_birthday_tuple[0])
@@ -220,33 +223,34 @@ class BirthdayGroup(app_commands.Group):
         if next_birthday.hasAge:
             out_str += f" They will be turning {date_helper.get_age(next_birthday)+1}."
 
-        await respond(interaction, out_str)
+        await respond(interaction, out_str, ephemeral=True)
 
 
     @app_commands.command(description="Removes your birthday from the bot")
     async def remove(self, interaction: Interaction):
         if db.get_birthday(interaction.user.id) is None:
-            await respond(interaction, "I didn't know your birthday anyway, so no harm no foul, right? :shrug:", False, ephemeral=True)
+            await respond(interaction, "I didn't know your birthday anyway, so no harm no foul, right? :shrug:", ephemeral=True)
             return
 
         db.remove_birthday(interaction.user.id)
-        await respond(interaction, ":cry: Sorry to see you go! I removed your birthday from my list.")
+        await respond(interaction, ":cry: Sorry to see you go! I removed your birthday from my list.", ephemeral=True)
 
-@bot.tree.command(description="(Admin) Shuts down the bot")
+@bot.tree.command(description="[Owner] Shuts down the bot")
+@app_commands.dm_only()
 async def bedtime(interaction: Interaction):
     if await bot.is_owner(interaction.user):
         print("Owner verified, shutting down")
         check_guilds.cancel()
-        await respond(interaction, ":yawning_face: :sleeping:")
+        await respond(interaction, ":yawning_face: :sleeping:", ephemeral=True)
         await bot.close()
         print("Shutdown Complete.")
     else:
         print("User doesn't have kill permission.")
-        await respond(interaction, ":triumph: You're not the boss of me.")
+        await respond(interaction, ":triumph: You're not the boss of me.", ephemeral=True)
 
 @bot.tree.command(description="Shows the bot's ping")
 async def ping(interaction: Interaction):
-    await respond(interaction, f":ping_pong: Pong! ({round(bot.latency*1000)}ms)")
+    await respond(interaction, f":ping_pong: Pong! ({round(bot.latency*1000)}ms)", ephemeral=True)
 
 
 # EVENTS
@@ -319,13 +323,13 @@ async def check_admin(interaction: Interaction):
     if not await check_server(interaction):
         return False
     if not is_member_admin(interaction.user):
-        await respond(interaction, ":triumph: You're not my admin, I don't have to listen to you!", False)
+        await respond(interaction, ":triumph: You're not my admin, I don't have to listen to you!", ephemeral=True)
         return False
     return True
 
 async def check_server(interaction: Interaction):
     if interaction.guild is None:
-        await respond(interaction, ":cowboy: Hold it right there, partner! You need to be in a server for this command to work!")
+        await respond(interaction, ":cowboy: Hold it right there, partner! You need to be in a server for this command to work!", ephemeral=True)
         return False
     return True
 
