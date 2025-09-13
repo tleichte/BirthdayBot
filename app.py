@@ -34,7 +34,6 @@ class MyBot(Bot):
 
 intents = discord.Intents.default()
 intents.members = True
-intents.messages = True
 bot = MyBot(command_prefix="!", intents=intents)
 bot.remove_command('help')
 
