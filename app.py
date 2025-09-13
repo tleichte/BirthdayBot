@@ -286,8 +286,7 @@ async def on_guild_join(guild: Guild):
     for member in guild.members:
         db.save_user_guild(member.id, guild.id)
     
-    if guild.system_channel is not None:
-        await guild.system_channel.send(f":wave: Hey, I'm Birthday Bot! Use */birthday help* to learn all of my commands.")
+    await guild.owner.send(f":wave: Hey, I'm Birthday Bot! Use */birthday help* to learn all of my commands.\n\nBe sure to call */birthday set_channel* on the channel that you would like me to announce birthdays!")
 
 @bot.event
 async def on_guild_remove(guild: Guild):
